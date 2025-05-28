@@ -1,11 +1,17 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const District = require("../models/district.model");
+const Machine = require("../models/machine.model");
+const Region = require("../models/region.model");
 
 const addDistrict = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, regionId } = req.body;
 
-    const newDistrict = await District.create({ name });
+    const district = await Region.findByPk(regionId);
+    if (!district) {
+      return sendErrorResponse({ message: "Bunday Region mavjud emas" }, res);
+    }
+    const newDistrict = await District.create({ name, regionId });
 
     res.status(201).send({ message: "District yaratildi", newDistrict });
   } catch (error) {
@@ -15,7 +21,21 @@ const addDistrict = async (req, res) => {
 
 const getAllDistricts = async (req, res) => {
   try {
-    const districts = await District.findAll();
+    const districts = await District.findAll({
+      include: [
+        {
+          model: Region,
+          attributes: ["name"],
+        },
+        {
+          model: Machine,
+          attributes: {
+            exclude: ["categoryId", "regionId", "districtId", "userId"],
+          },
+        },
+      ],
+      attributes: ["id", "name"],
+    });
     res.status(200).send(districts);
   } catch (error) {
     sendErrorResponse(error, res);

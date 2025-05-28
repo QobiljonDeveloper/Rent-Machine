@@ -10,12 +10,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "config": "^4.0.0",
     "express": "^5.1.0",
     "pg": "^8.16.0",
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.2"
   }
 }

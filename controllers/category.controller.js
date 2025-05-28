@@ -1,5 +1,6 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Category = require("../models/category.model");
+const Machine = require("../models/machine.model");
 
 const addCategory = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const addCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({});
     res.status(200).send(categories);
   } catch (error) {
     sendErrorResponse(error, res);
@@ -24,7 +25,17 @@ const getAllCategories = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await Category.findByPk(id);
+    const category = await Category.findByPk(id, {
+      include: [
+        {
+          model: Machine,
+          attributes: {
+            exclude: ["categoryId", "regionId", "districtId", "userId"],
+          },
+        },
+      ],
+      attributes: ["id", "name"],
+    });
     res.status(200).send(category);
   } catch (error) {
     sendErrorResponse(error, res);
