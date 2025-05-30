@@ -1,5 +1,6 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Machine = require("../models/machine.model");
+const Review = require("../models/review.model");
 const Role = require("../models/roles.model");
 const UserAddress = require("../models/user.address");
 const User = require("../models/users.model");
@@ -44,7 +45,7 @@ const getAllUsers = async (req, res) => {
           model: Role,
           attributes: ["name"],
           through: {
-            attributes:[]
+            attributes: [],
           },
         },
         {
@@ -53,10 +54,20 @@ const getAllUsers = async (req, res) => {
             exclude: ["categoryId", "regionId", "districtId", "userId"],
           },
         },
+        {
+          model: Review,
+          attributes: ["rating", "comment", ""],
+          include: [
+            {
+              model: Machine,
+              attributes: ["id", "name"],
+            },
+          ],
+        },
       ],
     });
 
-    res.status(200).send({ message: "Barcha manzillar", users });
+    res.status(200).send({ message: "Barcha Userlar", users });
   } catch (error) {
     sendErrorResponse(error, res);
   }
