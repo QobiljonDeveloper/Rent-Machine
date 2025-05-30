@@ -56,7 +56,7 @@ const getAllUsers = async (req, res) => {
         },
         {
           model: Review,
-          attributes: ["rating", "comment", ""],
+          attributes: ["rating", "comment"],
           include: [
             {
               model: Machine,
