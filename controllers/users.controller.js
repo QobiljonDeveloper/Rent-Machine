@@ -1,5 +1,6 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Machine = require("../models/machine.model");
+const Role = require("../models/roles.model");
 const UserAddress = require("../models/user.address");
 const User = require("../models/users.model");
 const bcrypt = require("bcrypt");
@@ -40,11 +41,19 @@ const getAllUsers = async (req, res) => {
           attributes: ["name", "address"],
         },
         {
+          model: Role,
+          attributes: ["name"],
+          through: {
+            attributes:[]
+          },
+        },
+        {
           model: Machine,
-          attributes: { exclude: ["categoryId", "regionId", "districtId", "userId"] },
+          attributes: {
+            exclude: ["categoryId", "regionId", "districtId", "userId"],
+          },
         },
       ],
-      attributes: ["id","full_name", "phone"],
     });
 
     res.status(200).send({ message: "Barcha manzillar", users });
