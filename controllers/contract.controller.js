@@ -1,3 +1,5 @@
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../config/db");
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Comission = require("../models/comission.model");
 const Contract = require("../models/contract.model");
@@ -143,10 +145,39 @@ const deleteContract = async (req, res) => {
   }
 };
 
+const getContractUserMachines = async (req, res) => {
+  try {
+    const { full_name, start_time, end_time, name } = req.body;
+
+    const machines = await sequelize.query(
+  `
+  SELECT m.*
+  FROM machine m
+  JOIN users u ON u.id = m."userId"
+  JOIN contract c ON c."machineId" = m.id
+  JOIN category ca ON m."categoryId" = ca.id
+  WHERE LOWER(u.full_name) = LOWER(:full_name)
+    AND c.start_time <= :end_time
+    AND c.end_time >= :start_time
+    AND LOWER(ca.name) = LOWER(:name)
+  `,
+  {
+    replacements: { full_name, start_time, end_time, name },
+    type: QueryTypes.SELECT,
+  }
+);
+
+    res.status(200).send({ machines });
+  } catch (error) {
+    sendErrorResponse(error, res);
+  }
+};
+
 module.exports = {
   addContract,
   getAllContract,
   getContractById,
   updateContract,
   deleteContract,
+  getContractUserMachines,
 };

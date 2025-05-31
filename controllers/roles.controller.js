@@ -34,7 +34,7 @@ const getAllRoles = async (req, res) => {
           attributes: ["full_name", "phone"],
         },
       ],
-      attributes: ["name"],
+      attributes: ["id", "name"],
     });
     res.status(200).send({ message: "Rolelar ro'yxat", roles });
   } catch (error) {

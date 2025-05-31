@@ -4,11 +4,13 @@ const {
   getContractById,
   updateContract,
   deleteContract,
+  getContractUserMachines,
 } = require("../controllers/contract.controller");
 
 const router = require("express").Router();
 
 router.post("/", addContract);
+router.post("/add", getContractUserMachines);
 router.get("/", getAllContract);
 router.patch("/:id", updateContract);
 router.delete("/:id", deleteContract);

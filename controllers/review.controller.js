@@ -17,7 +17,7 @@ const addReview = async (req, res) => {
     res.status(201).send({ message: "Review yaratildi", newReview });
   } catch (error) {
     sendErrorResponse(error, res);
-  }
+  }  
 };
 
 const getAllReviews = async (req, res) => {
