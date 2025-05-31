@@ -7,6 +7,7 @@ const Category = require("../models/category.model");
 const User = require("../models/users.model");
 const Contract = require("../models/contract.model");
 const Images = require("../models/images.model");
+const { Sequelize } = require("../config/db");
 const addMachine = async (req, res) => {
   try {
     const {
@@ -176,10 +177,24 @@ const getMachinesByRegionAndDistrict = async (req, res) => {
   }
 };
 
-const getMachinesWithImg = async (req, res) => {
-  try {
-  } catch (error) {}
-};
+  const getMachinesWithImg = async (req, res) => {
+    try {
+      const machines = await Machine.findAll({
+        include: [
+          {
+            model: Images,
+            attributes: [],
+          },
+        ],
+        group: ["machine.id"], 
+        having: Sequelize.literal("COUNT(images.id) >= 3"), 
+      });
+      res.status(200).send({ machines });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Serverda xatolik yuz berdi" });
+    }
+  };
 
 module.exports = {
   addMachine,
@@ -188,4 +203,5 @@ module.exports = {
   updateMachine,
   deleteMachine,
   getMachinesByRegionAndDistrict,
+  getMachinesWithImg,
 };

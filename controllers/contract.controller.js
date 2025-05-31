@@ -1,4 +1,4 @@
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, Op } = require("sequelize");
 const sequelize = require("../config/db");
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Comission = require("../models/comission.model");
@@ -150,7 +150,7 @@ const getContractUserMachines = async (req, res) => {
     const { full_name, start_time, end_time, name } = req.body;
 
     const machines = await sequelize.query(
-  `
+      `
   SELECT m.*
   FROM machine m
   JOIN users u ON u.id = m."userId"
@@ -161,13 +161,57 @@ const getContractUserMachines = async (req, res) => {
     AND c.end_time >= :start_time
     AND LOWER(ca.name) = LOWER(:name)
   `,
-  {
-    replacements: { full_name, start_time, end_time, name },
-    type: QueryTypes.SELECT,
-  }
-);
+      {
+        replacements: { full_name, start_time, end_time, name },
+        type: QueryTypes.SELECT,
+      }
+    );
 
     res.status(200).send({ machines });
+  } catch (error) {
+    sendErrorResponse(error, res);
+  }
+};
+
+
+const getCancelledContracts = async (req, res) => {
+  try {
+    const { start_time, end_time } = req.body;
+
+    if (!start_time || !end_time) {
+      return sendErrorResponse(
+        { message: "start Time va end Time kerak." },
+        res
+      );
+    }
+
+    const contracts = await Contract.findAll({
+      where: {
+        start_time: {
+          [Op.between]: [start_time, end_time],
+        },
+      },
+      include: [
+        {
+          model: Status,
+          where: {
+            name: "Canceled",
+          },
+          attributes: ["id", "name"],
+        },
+        {
+          model: Machine,
+          attributes: ["name", "price_per_hour", "min_hour", "min_price"],
+        },
+        {
+          model: User,
+          attributes: ["full_name", "phone"],
+        },
+
+      ],
+    });
+
+    res.status(200).send({ contracts });
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -180,4 +224,5 @@ module.exports = {
   updateContract,
   deleteContract,
   getContractUserMachines,
+  getCancelledContracts,
 };
